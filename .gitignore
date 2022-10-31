@@ -1,6 +1,7 @@
 # My stuff
 data/*
 saved_models/*
+tensorflow_hub/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
