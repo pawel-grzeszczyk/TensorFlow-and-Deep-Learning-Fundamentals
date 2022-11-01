@@ -1,3 +1,42 @@
+def unzip_data(filename, dest, del_MACOSX_file=True):
+    '''
+    Unzips the file ina given destination.
+
+    Args:
+        filename (str): name of the file to be unzippes
+        dest (str): destination where file will be unzipped
+        del_MACOSX_file (bool): do you want MACOSX file to be deleted?
+
+    Returns
+        Unzipped file in a given directory
+    '''
+
+    import zipfile
+    zip_ref = zipfile.ZipFile(filename)
+    zip_ref.extractall(dest)
+    zip_ref.close()
+
+    import shutil
+    shutil.rmtree('data/__MACOSX')
+
+
+def walk_through_dir(dir_name):
+    '''
+    Walks through a diven directory. A directory should contain of 
+    folders and files within these folders: path -> directories -> files
+
+    Args: 
+        dir_name (str): name of a directory to be walked through. 
+
+    Returns:
+        Formated string: 'There are {len(dirnames)} directories and {len(filenames)} images in "{dirpath}".'
+    '''
+    import os
+
+    for dirpath, dirnames, filenames in os.walk(dir_name):
+        print(f'There are {len(dirnames)} directories and {len(filenames)} images in "{dirpath}".')
+
+
 def view_random_image(target_dir, target_class):
     '''
     Prints a random image in target_class from target_dir.
