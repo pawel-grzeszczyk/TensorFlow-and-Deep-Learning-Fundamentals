@@ -4,6 +4,7 @@ saved_models/*
 tensorflow_hub/*
 transfer_learning/*
 ten_percent_model_checkpoints/*
+.idea/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

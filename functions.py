@@ -176,3 +176,95 @@ def create_model(model_url, trainable=False, layer_name='feature_extraction_laye
     ])
 
     return model
+
+# ---
+
+def compare_histories(original_history, new_history, initial_epochs=5):
+    """
+    Compares two TensorFlow History objects
+    """
+    import matplotlib.pyplot as plt
+
+    # Get original history measurements
+    acc = original_history.history['accuracy']
+    loss = original_history.history['loss']
+
+    val_acc = original_history.history['val_accuracy']
+    val_loss = original_history.history['val_loss']   
+
+    # Combine original history metrics with new_history metrics
+    total_acc = acc + new_history.history['accuracy']
+    total_loss = loss + new_history.history['loss']
+
+    total_val_acc = val_acc + new_history.history['val_accuracy']
+    total_val_loss = val_loss + new_history.history['val_loss']
+
+    # Make a plot for accuracy
+    plt.figure(figsize=(8, 8))
+    plt.subplot(2, 1, 1)
+    plt.plot(total_acc, label='Training accuracy')
+    plt.plot(total_val_acc, label='Validation accuracy')
+    plt.plot([initial_epochs-1, initial_epochs-1], plt.ylim(), label='Start Fine-Tuning')
+    plt.legend(loc='lower right')
+    plt.title('Training and Validation Accuracy')
+
+    # Make a plot for loss
+    plt.figure(figsize=(8, 8))
+    plt.subplot(2, 1, 2)
+    plt.plot(total_loss, label='Training loss')
+    plt.plot(total_val_loss, label='Validation loss')
+    plt.plot([initial_epochs-1, initial_epochs-1], plt.ylim(), label='Start Fine-Tuning')
+    plt.legend(loc='upper right')
+    plt.title('Training and Validation Loss')
+
+
+def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10,10), color_bar=False, text_size=15):
+
+    import itertools
+    from sklearn.metrics import confusion_matrix
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    cm = confusion_matrix(y_true, y_pred)
+    cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] # normalize our confusion matrix
+    n_classes = cm.shape[0]
+
+    # Let's prettify it
+    fig, ax = plt.subplots(figsize=figsize)
+    cax = ax.matshow(cm, cmap=plt.cm.Blues) # plot the values of a 2D matrix or array as color-coded image.
+    if color_bar == True:
+        fig.colorbar(cax) # colorbar
+
+    # Set labels to be classes
+    if classes:
+        labels = classes
+    else:
+        labels = np.arange(cm.shape[0])
+
+    # Label the axis 
+    ax.set(title='Confusion Matrix',
+        xlabel='Predicted Label',
+        ylabel='True Label',
+        xticks=np.arange(n_classes),
+        yticks=np.arange(n_classes),
+        xticklabels=labels,
+        yticklabels=labels)
+
+    # Set x-axis labels to the bottom
+    ax.xaxis.set_label_position('bottom')
+    ax.xaxis.tick_bottom()
+
+    # Adjust label size
+    ax.yaxis.label.set_size(text_size)
+    ax.xaxis.label.set_size(text_size)
+    ax.title.set_size(text_size+5)
+
+    # Set the threshold for different colors
+    threshold = (cm.max() + cm.min()) / 2
+
+    # Plot the text on each cell
+    for i,j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i , f'{cm[i, j]} ({cm_norm[i, j]*100:.1f}%)',
+                horizontalalignment='center',
+                color='white' if cm[i, j] > threshold else 'black',
+                size=text_size)
